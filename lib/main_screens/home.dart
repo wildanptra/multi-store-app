@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:multi_store_app/minor_screens/search.dart';
 import 'package:multi_store_app/widgets/fake_search.dart';
 
 class HomeScreen extends StatefulWidget {
