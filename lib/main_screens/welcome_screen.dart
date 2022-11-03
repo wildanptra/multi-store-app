@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_store_app/widgets/yellow_button.dart';
@@ -29,6 +31,9 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin{
 
   late AnimationController _controller;
+  bool processing = false;
+  CollectionReference customers = FirebaseFirestore.instance.collection('customers');
+  late String _uid;
 
   @override
   void initState() {
@@ -145,12 +150,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                             YellowButton(
                               label: 'Log In',
                               onPressed: (){
-                                Navigator.pushReplacementNamed(context, '/supplier_home');
+                                Navigator.pushReplacementNamed(context, '/supplier_login');
                               }, 
                               width: 0.25),
                             Padding(
                               padding: const EdgeInsets.only(right: 8),
-                              child: YellowButton(label: 'Sign Up', onPressed: (){}, width: 0.25),
+                              child: YellowButton(label: 'Sign Up', onPressed: (){
+                                Navigator.pushReplacementNamed(context, '/supplier_signup');
+                              }, width: 0.25),
                             ),
                           ],
                         ),
@@ -176,11 +183,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         YellowButton(label: 'Log In', onPressed: (){
-                          Navigator.pushReplacementNamed(context, '/customer_home');
+                          Navigator.pushReplacementNamed(context, '/customer_login');
                         }, width: 0.25),
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
-                          child: YellowButton(label: 'Sign Up', onPressed: (){}, width: 0.25),
+                          child: YellowButton(label: 'Sign Up', onPressed: (){
+                            Navigator.pushNamed(context, '/customer_signup');
+                          }, width: 0.25),
                         ),
                         AnimatedLogo(controller: _controller),
                       ],
@@ -213,9 +222,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                           image: AssetImage('images/inapp/facebook.jpg')
                         )
                       ),
-                      GoogleFacebookLogin(
+                      processing ? const CircularProgressIndicator() 
+                      : GoogleFacebookLogin(
                         label: 'Guest',
-                        onPressed: () {},
+                        onPressed: () async{
+                          setState(() {
+                            processing = true;
+                          });
+                          await FirebaseAuth.instance.signInAnonymously().whenComplete(() async{
+                            _uid = FirebaseAuth.instance.currentUser!.uid;
+                            await customers.doc(_uid).set({
+                              'name' : '',
+                              'email' : '',
+                              'profileImage' : '',
+                              'phone' : '',
+                              'address' : '',
+                              'cid' : _uid,
+                            });
+                          });
+                          Navigator.pushNamedAndRemoveUntil(context, '/customer_home', (route) => false);
+                        },
                         child: const Icon(
                           Icons.person,
                           size: 55,
@@ -281,7 +307,7 @@ class GoogleFacebookLogin extends StatelessWidget {
         vertical: 8.0
       ),
       child: InkWell(
-        onTap: (){},
+        onTap: onPressed,
         child: Column(
           children: [
             SizedBox(

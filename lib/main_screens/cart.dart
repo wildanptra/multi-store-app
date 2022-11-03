@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:multi_store_app/main_screens/customer_home.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 import 'package:multi_store_app/widgets/yellow_button.dart';
 

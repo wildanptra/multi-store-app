@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_store_app/dashboard_components/edit_business.dart';
@@ -45,19 +47,40 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const AppBarTitle(
-          title: 'Dashboard'
-        ),
+        title: const AppBarTitle(title: 'Dashboard'),
         actions: [
           IconButton(
-            onPressed: (){
-              Navigator.pushReplacementNamed(context, '/welcome_screen');
-            },
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.black,
-            )
-          )
+              onPressed: () async {
+                await showCupertinoModalPopup<void>(
+                  context: context,
+                  builder: (BuildContext context) => CupertinoAlertDialog(
+                    title: const Text('Log Out'),
+                    content: const Text('Are you sure to log out?'),
+                    actions: <CupertinoDialogAction>[
+                      CupertinoDialogAction(
+                        isDefaultAction: true,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('No'),
+                      ),
+                      CupertinoDialogAction(
+                        isDestructiveAction: true,
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.pushReplacementNamed(
+                              context, '/welcome_screen');
+                        },
+                        child: const Text('Yes'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.black,
+              ))
         ],
       ),
       body: Padding(
@@ -66,10 +89,11 @@ class DashboardScreen extends StatelessWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 50,
           mainAxisSpacing: 50,
-          children: List.generate(6, (index){
+          children: List.generate(6, (index) {
             return InkWell(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => pages[index]));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => pages[index]));
               },
               child: Card(
                 elevation: 15,
@@ -86,11 +110,10 @@ class DashboardScreen extends StatelessWidget {
                     Text(
                       label[index].toUpperCase(),
                       style: GoogleFonts.acme(
-                        fontSize: 16,
-                        color: Colors.yellowAccent,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2
-                      ),
+                          fontSize: 16,
+                          color: Colors.yellowAccent,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 2),
                       textAlign: TextAlign.center,
                     ),
                   ],
