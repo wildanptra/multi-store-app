@@ -107,6 +107,7 @@ class AuthHeaderLabel extends StatelessWidget {
 var textFormDecoration = InputDecoration(
   labelText: '',
   hintText: '',
+  labelStyle: const TextStyle(color: Colors.purple),
   border: OutlineInputBorder(
     borderRadius: BorderRadius.circular(25),
   ),

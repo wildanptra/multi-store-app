@@ -28,12 +28,12 @@ class AccessoriesCateg extends StatelessWidget {
                       mainAxisSpacing: 70,
                       crossAxisSpacing: 15,
                       crossAxisCount: 3,
-                      children: List.generate(accessories.length, (index) {
+                      children: List.generate(accessories.length -1, (index) {
                         return SubcategModel(
                           assetName: 'images/accessories/accessories$index.jpg',
                           mainCategName: 'accessories',
-                          subCategName: accessories[index],
-                          subCategLabel: accessories[index]
+                          subCategName: accessories[index + 1],
+                          subCategLabel: accessories[index + 1]
                         );
                       }),
                     ),
