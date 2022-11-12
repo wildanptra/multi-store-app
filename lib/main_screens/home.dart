@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:multi_store_app/galleries/accessories_gallery.dart';
+import 'package:multi_store_app/galleries/bag_gallery.dart';
+import 'package:multi_store_app/galleries/beauty_gallery.dart';
+import 'package:multi_store_app/galleries/electronic_gallery.dart';
+import 'package:multi_store_app/galleries/homegarden_gallery.dart';
+import 'package:multi_store_app/galleries/kids_gallery.dart';
+import 'package:multi_store_app/galleries/men_gallery.dart';
+import 'package:multi_store_app/galleries/shoes.gallery.dart';
+import 'package:multi_store_app/galleries/women_gallery.dart';
 import 'package:multi_store_app/widgets/fake_search.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return DefaultTabController(
       length: 9,
       child: Scaffold(
+        backgroundColor: Colors.blueGrey.shade100.withOpacity(0.5),
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.white,
@@ -37,33 +47,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: const TabBarView(
           children: [
-            Center(
-              child: Text('men screen'),
-            ),
-            Center(
-              child: Text('women screen'),
-            ),
-            Center(
-              child: Text('shoes screen'),
-            ),
-            Center(
-              child: Text('bags screen'),
-            ),
-            Center(
-              child: Text('electronics screen'),
-            ),
-            Center(
-              child: Text('accessories screen'),
-            ),
-            Center(
-              child: Text('home and garden screen'),
-            ),
-            Center(
-              child: Text('kids screen'),
-            ),
-            Center(
-              child: Text('beauty screen'),
-            ),
+            MenGalleryScreen(),
+            WomenGalleryScreen(),
+            ShoesGalleryScreen(),
+            BagGalleryScreen(),
+            ElectronicGalleryScreen(),
+            AccessoriesGalleryScreen(),
+            HomeGardenGalleryScreen(),
+            KidsGalleryScreen(),
+            BeautyGalleryScreen(),
           ],
         ),
       ),

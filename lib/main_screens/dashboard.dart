@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_store_app/dashboard_components/edit_business.dart';
 import 'package:multi_store_app/dashboard_components/manage_products.dart';
-import 'package:multi_store_app/dashboard_components/my_store.dart';
 import 'package:multi_store_app/dashboard_components/supplier_balance.dart';
 import 'package:multi_store_app/dashboard_components/supplier_orders.dart';
 import 'package:multi_store_app/dashboard_components/supplier_statics.dart';
+import 'package:multi_store_app/minor_screens/visit_store.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 
 List<String> label = [
@@ -28,13 +28,13 @@ List<IconData> icons = [
   Icons.show_chart,
 ];
 
-List<Widget> pages = const [
-  MyStore(),
-  SupplierOrders(),
-  EditBussiness(),
-  ManageProducts(),
-  SupplierBalance(),
-  SupplierStatics(),
+List<Widget> pages = [
+  VisitStore(supplierId: FirebaseAuth.instance.currentUser!.uid),
+  const SupplierOrders(),
+  const EditBussiness(),
+  const ManageProducts(),
+  const SupplierBalance(),
+  const SupplierStatics(),
 ];
 
 class DashboardScreen extends StatelessWidget {
