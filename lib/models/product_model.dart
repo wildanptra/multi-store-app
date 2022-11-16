@@ -100,9 +100,11 @@ class _ProductModelState extends State<ProductModel> {
                                 ) != null ? const Icon(
                                 Icons.favorite,
                                 color: Colors.red,
+                                size: 30,
                               ): const Icon(
                                 Icons.favorite_border_outlined,
                                 color: Colors.red,
+                                size: 30,
                               ),
                             ),
                         ],

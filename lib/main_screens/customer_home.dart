@@ -5,6 +5,9 @@ import 'package:multi_store_app/main_screens/category.dart';
 import 'package:multi_store_app/main_screens/home.dart';
 import 'package:multi_store_app/main_screens/profile.dart';
 import 'package:multi_store_app/main_screens/stores.dart';
+import 'package:multi_store_app/providers/cart_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:badges/badges.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -34,24 +37,40 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           fontWeight: FontWeight.w600
         ),
         currentIndex: _selectedIndex,
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home'
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Category'
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.shop),
             label: 'Store'
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: Badge(
+              showBadge: context.read<Cart>().getItems.isEmpty
+                  ? false
+                  : true,
+              padding: const EdgeInsets.all(2),
+              badgeColor: Colors.yellow,
+              badgeContent: Text(
+                context
+                    .watch<Cart>()
+                    .getItems
+                    .length
+                    .toString(),
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              child: const Icon(Icons.shopping_cart)
+            ),
             label: 'Cart'
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile'
           ),

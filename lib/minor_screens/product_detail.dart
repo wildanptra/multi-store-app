@@ -26,7 +26,6 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-
   late final Stream<QuerySnapshot> _productsStream = FirebaseFirestore.instance
       .collection('products')
       .where('mainCategory', isEqualTo: widget.productList['mainCategory'])
@@ -40,9 +39,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     var existingItemCart = context.read<Cart>().getItems.firstWhereOrNull(
-      (product) => product.documentId == widget.productList['productId']);
+        (product) => product.documentId == widget.productList['productId']);
 
     return Material(
       child: SafeArea(
@@ -147,12 +145,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                             IconButton(
                               onPressed: () {
-
                                 var existingItemWishList = context
-                                  .read<Wish>()
-                                  .getWishItems
-                                  .firstWhereOrNull(
-                                      (product) => product.documentId == widget.productList['productId']);
+                                    .read<Wish>()
+                                    .getWishItems
+                                    .firstWhereOrNull((product) =>
+                                        product.documentId ==
+                                        widget.productList['productId']);
 
                                 existingItemWishList != null
                                     ? context.read<Wish>().removeThis(
@@ -188,11 +186,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
-                        Text(
-                          '${widget.productList['instock'].toString()} Pieces available in stock',
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.blueGrey),
-                        ),
+                        widget.productList['instock'] == 0
+                            ? const Text(
+                                'This item is out of stock',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.blueGrey),
+                              )
+                            : Text(
+                                '${widget.productList['instock'].toString()} Pieces available in stock',
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.blueGrey),
+                              ),
                         const ProductDetailLabel(
                           label: 'Item Description',
                         ),
@@ -311,12 +315,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                   YellowButton(
-                      label: existingItemCart != null ? 'Added To Cart' :  'Add To Cart',
+                      label: existingItemCart != null
+                          ? 'Added To Cart'
+                          : 'Add To Cart',
                       onPressed: () {
-                        existingItemCart != null
-                            ? MyMessageHandler.showSnackBar(
-                                _scaffoldKey, 'this item already in cart')
-                            : context.read<Cart>().addItem(
+
+                        if(widget.productList['instock'] == 0){
+                          MyMessageHandler.showSnackBar(
+                                _scaffoldKey, 'this item is out of stock');
+                        }else if(existingItemCart != null){
+                          MyMessageHandler.showSnackBar(
+                                _scaffoldKey, 'this item already in cart');
+                        }else{
+                          context.read<Cart>().addItem(
                                   widget.productList['productName'],
                                   widget.productList['price'],
                                   1,
@@ -325,6 +336,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   widget.productList['productId'],
                                   widget.productList['sid'],
                                 );
+                        }
                       },
                       width: 0.55)
                 ],

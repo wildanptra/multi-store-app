@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:multi_store_app/minor_screens/place_order.dart';
 import 'package:multi_store_app/models/cart_model.dart';
 import 'package:multi_store_app/providers/cart_provider.dart';
 import 'package:multi_store_app/widgets/alert_dialog.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
-import 'package:multi_store_app/widgets/yellow_button.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatefulWidget {
@@ -17,6 +17,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
+  double total = context.watch<Cart>().totalPrice;
     return Material(
       child: SafeArea(
         child: Scaffold(
@@ -66,7 +67,7 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     ),
                     Text(
-                      context.watch<Cart>().totalPrice.toStringAsFixed(2),
+                      total.toStringAsFixed(2),
                       style: const  TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -75,10 +76,19 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                   ],
                 ),
-                YellowButton(
-                  width: 0.45,
-                  label: 'CHECK OUT',
-                  onPressed: (){},
+                Container(
+                  height: 40,
+                  width: MediaQuery.of(context).size.width * 0.45,
+                  decoration: BoxDecoration(
+                    color: Colors.yellow,
+                    borderRadius: BorderRadius.circular(25)
+                  ),
+                  child: MaterialButton(
+                    onPressed: total == 0.0 ? null : (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const PlaceOrderScreen()));
+                    },
+                    child: const Text('Check Out'),
+                  ),
                 ),
               ]
             ),
@@ -141,18 +151,21 @@ class CartItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Cart>(
-     builder: (context, cart, child) {
-       return ListView.builder(
-         itemCount: cart.count,
-         itemBuilder: (context, index){
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 60.0),
+      child: Consumer<Cart>(
+       builder: (context, cart, child) {
+         return ListView.builder(
+           itemCount: cart.count,
+           itemBuilder: (context, index){
 
-           final product = cart.getItems[index];
+             final product = cart.getItems[index];
 
-           return CartModel(product: product, cart: context.read<Cart>(),);
-         }
-       );
-     },
-          );
+             return CartModel(product: product, cart: context.read<Cart>(),);
+           }
+         );
+       },
+            ),
+    );
   }
 }
