@@ -27,6 +27,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
   late double price;
   late int qty;
   late String productName, productDescription, productId;
+  int? discount = 0;
 
   String mainCategValue = 'select category';
   String subCategValue = 'subcategory';
@@ -121,22 +122,13 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
           }
 
         } else {
-          setState(() {
-            processing = true;
-          });
           MyMessageHandler.showSnackBar(
               _scaffoldKey, 'please pick images first');
         }
       } else {
-        setState(() {
-          processing = true;
-        });
         MyMessageHandler.showSnackBar(_scaffoldKey, 'please fill all fields');
       }
     } else {
-      setState(() {
-        processing = true;
-      });
       MyMessageHandler.showSnackBar(_scaffoldKey, 'please select categories');
     }
   }
@@ -158,7 +150,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
         'productDescription' : productDescription,
         'sid' : FirebaseAuth.instance.currentUser!.uid,
         'productImages' : imagesUrlList,
-        'discount' : 0,
+        'discount' : discount,
 
       }).whenComplete(() {
         setState(() {
@@ -310,30 +302,60 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                       thickness: 1.5,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.38,
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'please enter price';
-                          } else if (value.isValidPrice() != true) {
-                            return 'invalid price';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          price = double.parse(value!);
-                        },
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        decoration: textFormDecoration.copyWith(
-                          labelText: 'Price',
-                          hintText: 'Price..  \$',
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.38,
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'please enter price';
+                              } else if (value.isValidPrice() != true) {
+                                return 'invalid price';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              price = double.parse(value!);
+                            },
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            decoration: textFormDecoration.copyWith(
+                              labelText: 'Price',
+                              hintText: 'Price..  \$',
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.38,
+                          child: TextFormField(
+                            maxLength: 2,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return null;
+                              }else if (value.isValidDiscount() != true) {
+                                return 'invalid discount';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              value!.isEmpty ? null : discount = int.parse(value);
+                            },
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            decoration: textFormDecoration.copyWith(
+                              labelText: 'Discount',
+                              hintText: 'Discount..  %',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -438,7 +460,7 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
                 uploadProduct();
               },
               backgroundColor: Colors.yellow,
-              child: processing ? const CircularProgressIndicator(color: Colors.black,) : const Icon(Icons.upload, color: Colors.black),
+              child: processing == true ? const CircularProgressIndicator(color: Colors.black,) : const Icon(Icons.upload, color: Colors.black),
             ),
           ],
         ),
@@ -475,6 +497,13 @@ extension QuantityValidator on String {
 extension PriceValidator on String {
   bool isValidPrice() {
     return RegExp(r'^((([1-9][0-9]*[\.]*)||([0][\.]*))([0-9]{1,2}))$')
+        .hasMatch(this);
+  }
+}
+
+extension DiscountValidator on String {
+  bool isValidDiscount() {
+    return RegExp(r'^([0-9]*)$')
         .hasMatch(this);
   }
 }

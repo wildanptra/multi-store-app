@@ -62,9 +62,6 @@ class _AccessoriesGalleryScreenState extends State<AccessoriesGalleryScreen> {
               staggeredTileBuilder: (context) => const StaggeredTile.fit(1)),
           );
         }
-
-        
-
       },
     );
   }
