@@ -16,6 +16,7 @@ import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:badges/badges.dart';
+import 'package:expandable/expandable.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final dynamic productList;
@@ -30,6 +31,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       .collection('products')
       .where('mainCategory', isEqualTo: widget.productList['mainCategory'])
       .where('subCategory', isEqualTo: widget.productList['subCategory'])
+      .snapshots();
+
+   late final Stream<QuerySnapshot> reviewStream = FirebaseFirestore.instance
+      .collection('products')
+      .doc(widget.productList['productId'])
+      .collection('reviews')
+      .snapshots();
+   
+   late final Stream<QuerySnapshot> reviewTotalStream = FirebaseFirestore.instance
+      .collection('products')
+      .doc(widget.productList['productId'])
+      .collection('reviews')
       .snapshots();
 
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
@@ -226,6 +239,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               fontWeight: FontWeight.w600,
                               color: Colors.blueGrey.shade800),
                         ),
+                        Stack(
+                          children: [
+                            Positioned(
+                              child: Row(
+                                children: [
+                                  const Text('Total Review'),
+                                  const SizedBox(width: 10,),
+                                  totalReview(reviewTotalStream),
+                                ],
+                              ),
+                              right: 50,
+                              top: 13,
+                            ),
+                            ExpandableTheme(
+                              data: const ExpandableThemeData(
+                                iconSize: 30,
+                                iconColor: Colors.blue
+                              ),
+                              child: reviews(reviewStream)
+                            ),
+                          ],
+                        ),
                         const ProductDetailLabel(
                           label: 'Similar Items',
                         ),
@@ -405,4 +440,136 @@ class ProductDetailLabel extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget reviews(var reviewStream){
+  return ExpandablePanel(
+    header: const Padding(
+      padding: EdgeInsets.all(10),
+      child: Text(
+        'Reviews',
+        style: TextStyle(
+          color: Colors.blue,
+          fontSize: 24,
+          fontWeight: FontWeight.bold
+        ),
+      ),
+    ),
+    collapsed: SizedBox(height: 230, child: reviewsAll(reviewStream),), 
+    expanded: reviewsAll(reviewStream),
+  );
+}
+
+Widget reviewsAll(var reviewStream){
+  return StreamBuilder<QuerySnapshot>(
+      stream: reviewStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot2) {
+
+        if (snapshot2.hasError) {
+          return const Text('Something went wrong');
+        }
+
+        if (snapshot2.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if(snapshot2.data!.docs.isEmpty){
+          return Center(
+            child:Text(
+              'This Item \n\n has no reviews yet !',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.acme(
+                fontSize: 26, 
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            )
+          );
+        }else{
+          return ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: snapshot2.data!.docs.length,
+            itemBuilder: (context,index){
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    snapshot2.data!.docs[index]['profileImage']
+                  ),
+                ),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      snapshot2.data!.docs[index]['name']
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          snapshot2.data!.docs[index]['rate'].toString()
+                        ),
+                        const Icon(
+                          Icons.star, 
+                          color: Colors.amber
+                        )
+                      ],
+                    )
+                  ],
+                ),
+                subtitle: Text(snapshot2.data!.docs[index]['comment']),
+              );
+            }
+          );
+        }
+      },
+    );
+}
+
+Widget totalReview(var reviewTotalStream){
+  return StreamBuilder<QuerySnapshot>(
+      stream: reviewTotalStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot3) {
+
+        if (snapshot3.hasError) {
+          return const Text('Something went wrong');
+        }
+
+        if (snapshot3.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if(snapshot3.data!.docs.isEmpty){
+          return Row(
+            children: const [
+              Text(
+                '0',
+              ),
+              Icon(
+                Icons.star, 
+                color: Colors.amber
+              )
+            ],
+          );
+        }else{
+          var average = snapshot3.data!.docs.map((e) => e['rate']).reduce((value, element) => value + element) / snapshot3.data!.docs.length;
+
+          return Row(
+            children: [
+              Text(
+                 average.toString(),
+              ),
+              const Icon(
+                Icons.star, 
+                color: Colors.amber
+              )
+            ],
+          );
+        }
+      },
+    );
 }

@@ -18,15 +18,15 @@ class CustomerRegister extends StatefulWidget {
 }
 
 class _CustomerRegisterState extends State<CustomerRegister> {
-
   late String name, email, password, profileImage, _uid;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   bool processing = false;
-  
+
   bool passwordVisible = true;
 
   // packages for image picker
@@ -38,16 +38,20 @@ class _CustomerRegisterState extends State<CustomerRegister> {
   // file image error
   dynamic _pickImageError;
 
-  // Collection firebase 
-  CollectionReference customers = FirebaseFirestore.instance.collection('customers');
+  // Collection firebase
+  CollectionReference customers =
+      FirebaseFirestore.instance.collection('customers');
 
-  void _pickImageFromCamera ()  async {
-
+  void _pickImageFromCamera() async {
     try {
-      final pickedImage = await _picker.pickImage(source: ImageSource.camera, maxHeight: 300, maxWidth: 300, imageQuality: 95);
+      final pickedImage = await _picker.pickImage(
+          source: ImageSource.camera,
+          maxHeight: 300,
+          maxWidth: 300,
+          imageQuality: 95);
       setState(() {
         _imageFile = pickedImage;
-      }); 
+      });
     } catch (e) {
       setState(() {
         _pickImageError = e;
@@ -56,13 +60,16 @@ class _CustomerRegisterState extends State<CustomerRegister> {
     }
   }
 
-  void _pickImageFromGallery ()  async {
-
+  void _pickImageFromGallery() async {
     try {
-      final pickedImage = await _picker.pickImage(source: ImageSource.gallery, maxHeight: 300, maxWidth: 300, imageQuality: 95);
+      final pickedImage = await _picker.pickImage(
+          source: ImageSource.gallery,
+          maxHeight: 300,
+          maxWidth: 300,
+          imageQuality: 95);
       setState(() {
         _imageFile = pickedImage;
-      }); 
+      });
     } catch (e) {
       setState(() {
         _pickImageError = e;
@@ -75,14 +82,15 @@ class _CustomerRegisterState extends State<CustomerRegister> {
     setState(() {
       processing = true;
     });
-    if(_formKey.currentState!.validate()){
-      if(_imageFile != null){
+    if (_formKey.currentState!.validate()) {
+      if (_imageFile != null) {
         try {
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+          await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(email: email, password: password);
 
-          firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref(
-            'cust-images/$email.jpg'
-          );
+          firebase_storage.Reference ref = firebase_storage
+              .FirebaseStorage.instance
+              .ref('cust-images/$email.jpg');
 
           await ref.putFile(File(_imageFile!.path));
 
@@ -91,12 +99,12 @@ class _CustomerRegisterState extends State<CustomerRegister> {
           profileImage = await ref.getDownloadURL();
 
           await customers.doc(_uid).set({
-            'name' : name,
-            'email' : email,
-            'profileImage' : profileImage,
-            'phone' : '',
-            'address' : '',
-            'cid' : _uid,
+            'name': name,
+            'email': email,
+            'profileImage': profileImage,
+            'phone': '',
+            'address': '',
+            'cid': _uid,
           });
 
           _formKey.currentState!.reset();
@@ -105,28 +113,34 @@ class _CustomerRegisterState extends State<CustomerRegister> {
             _imageFile = null;
           });
 
-          Navigator.pushNamedAndRemoveUntil(context, '/customer_login', (route) => false);
+          await Future.delayed(const Duration(microseconds: 100)).whenComplete(
+            () {
+              Navigator.pushNamedAndRemoveUntil(context, '/customer_login', (route) => false);    
+            }
+          );
 
         } on FirebaseAuthException catch (e) {
-          if(e.code == 'weak-password'){
+          if (e.code == 'weak-password') {
             setState(() {
               processing = false;
             });
-            MyMessageHandler.showSnackBar(_scaffoldKey, 'The password provided is too weak.');
-          }else if(e.code == 'email-already-in-use'){
+            MyMessageHandler.showSnackBar(
+                _scaffoldKey, 'The password provided is too weak.');
+          } else if (e.code == 'email-already-in-use') {
             setState(() {
               processing = false;
             });
-            MyMessageHandler.showSnackBar(_scaffoldKey, 'The account already exists for that email.');
+            MyMessageHandler.showSnackBar(
+                _scaffoldKey, 'The account already exists for that email.');
           }
         }
-      }else{
+      } else {
         setState(() {
           processing = false;
         });
         MyMessageHandler.showSnackBar(_scaffoldKey, 'please pick image first.');
       }
-    }else{
+    } else {
       setState(() {
         processing = false;
       });
@@ -150,15 +164,20 @@ class _CustomerRegisterState extends State<CustomerRegister> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      const AuthHeaderLabel(headerLabel: 'Sign Up',),
+                      const AuthHeaderLabel(
+                        headerLabel: 'Sign Up',
+                      ),
                       Row(
                         children: [
                           Padding(
-                            padding: const  EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 40),
                             child: CircleAvatar(
                               radius: 60,
                               backgroundColor: Colors.purpleAccent,
-                              backgroundImage: _imageFile == null ? null:FileImage(File(_imageFile!.path)) ,
+                              backgroundImage: _imageFile == null
+                                  ? null
+                                  : FileImage(File(_imageFile!.path)),
                             ),
                           ),
                           Column(
@@ -209,8 +228,8 @@ class _CustomerRegisterState extends State<CustomerRegister> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: TextFormField(
-                          validator: (value){
-                            if(value!.isEmpty){
+                          validator: (value) {
+                            if (value!.isEmpty) {
                               return 'please enter your full name';
                             }
                             return null;
@@ -220,20 +239,19 @@ class _CustomerRegisterState extends State<CustomerRegister> {
                           },
                           // controller: _nameController,
                           decoration: textFormDecoration.copyWith(
-                            labelText: 'Full Name', 
-                            hintText: 'Enter your Full Name'
-                          ),
+                              labelText: 'Full Name',
+                              hintText: 'Enter your Full Name'),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: TextFormField(
-                          validator: (value){
-                            if(value!.isEmpty){
+                          validator: (value) {
+                            if (value!.isEmpty) {
                               return 'please enter your email';
-                            } else if(value.isValidEmail() == false){
+                            } else if (value.isValidEmail() == false) {
                               return 'invalid email';
-                            }else if(value.isValidEmail() == true){
+                            } else if (value.isValidEmail() == true) {
                               return null;
                             }
                             return null;
@@ -244,16 +262,15 @@ class _CustomerRegisterState extends State<CustomerRegister> {
                           // controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: textFormDecoration.copyWith(
-                            labelText: 'Email Address', 
-                            hintText: 'Enter your email'
-                          ),
+                              labelText: 'Email Address',
+                              hintText: 'Enter your email'),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: TextFormField(
-                          validator: (value){
-                            if(value!.isEmpty){
+                          validator: (value) {
+                            if (value!.isEmpty) {
                               return 'please enter your password';
                             }
                             return null;
@@ -265,17 +282,18 @@ class _CustomerRegisterState extends State<CustomerRegister> {
                           obscureText: passwordVisible,
                           decoration: textFormDecoration.copyWith(
                             suffixIcon: IconButton(
-                              onPressed: (){
-                                setState(() {
-                                  passwordVisible = !passwordVisible;
-                                });
-                              },
-                              icon: Icon(
-                                passwordVisible ? Icons.visibility : Icons.visibility_off,
-                                color: Colors.purple,
-                              )
-                            ),
-                            labelText: 'Password', 
+                                onPressed: () {
+                                  setState(() {
+                                    passwordVisible = !passwordVisible;
+                                  });
+                                },
+                                icon: Icon(
+                                  passwordVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: Colors.purple,
+                                )),
+                            labelText: 'Password',
                             hintText: 'Enter your password',
                           ),
                         ),
@@ -283,16 +301,21 @@ class _CustomerRegisterState extends State<CustomerRegister> {
                       HaveAccount(
                         actionLabel: 'Log In',
                         haveAccount: 'already have account?',
-                        onPressed: (){
-                          Navigator.pushReplacementNamed(context, '/customer_login');
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                              context, '/customer_login');
                         },
                       ),
-                      processing ? const CircularProgressIndicator(color: Colors.purple,) : AuthMainButton(
-                        mainButtonLabel: 'Sign Up',
-                        onPressed: (){
-                          signUp();
-                        },
-                      ),
+                      processing
+                          ? const CircularProgressIndicator(
+                              color: Colors.purple,
+                            )
+                          : AuthMainButton(
+                              mainButtonLabel: 'Sign Up',
+                              onPressed: () {
+                                signUp();
+                              },
+                            ),
                     ],
                   ),
                 ),

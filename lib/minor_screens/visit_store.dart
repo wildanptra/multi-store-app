@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:multi_store_app/minor_screens/edit_store.dart';
 import 'package:multi_store_app/models/product_model.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
@@ -49,7 +50,7 @@ class _VisitStoreState extends State<VisitStore> {
             backgroundColor: Colors.blueGrey.shade100,
             appBar: AppBar(
               toolbarHeight: 100,
-              flexibleSpace: Image.asset(
+              flexibleSpace: data['coverImage'] != null ? Image.network(data['coverImage'], fit: BoxFit.cover,) :  Image.asset(
                 'images/inapp/coverimage.jpg',
                 fit: BoxFit.cover,
               ),
@@ -77,63 +78,66 @@ class _VisitStoreState extends State<VisitStore> {
                   SizedBox(
                     height: 100,
                     width: MediaQuery.of(context).size.width * 0.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                data['storeName'].toString().toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.yellow
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
+                                child: Text(
+                                  data['storeName'].toString().toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.yellow
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        data['sid'] == FirebaseAuth.instance.currentUser!.uid  ?  Container(
-                          height: 35,
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            border: Border.all(width: 3, color: Colors.black),
-                            borderRadius: BorderRadius.circular(25)
+                            ],
                           ),
-                          child: MaterialButton(
-                            onPressed: (){
-                              
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: const [
-                                Text('Edit'),
-                                Icon(Icons.edit, color: Colors.black,)
-                              ]
+                          data['sid'] == FirebaseAuth.instance.currentUser!.uid  ?  Container(
+                            height: 35,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              border: Border.all(width: 3, color: Colors.black),
+                              borderRadius: BorderRadius.circular(25)
                             ),
-                          )
-                        ): Container(
-                          height: 35,
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            border: Border.all(width: 3, color: Colors.black),
-                            borderRadius: BorderRadius.circular(25)
+                            child: MaterialButton(
+                              onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) =>  EditStore(data: data) ));
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: const [
+                                  Text('Edit'),
+                                  Icon(Icons.edit, color: Colors.black,)
+                                ]
+                              ),
+                            )
+                          ) : Container(
+                            height: 35,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              border: Border.all(width: 3, color: Colors.black),
+                              borderRadius: BorderRadius.circular(25)
+                            ),
+                            child: MaterialButton(
+                              onPressed: (){
+                                setState(() {
+                                  following = !following;
+                                });
+                              },
+                              child: following ? const Text('FOLLOWING') : const Text('FOLLOW'), 
+                            )
                           ),
-                          child: MaterialButton(
-                            onPressed: (){
-                              setState(() {
-                                following = !following;
-                              });
-                            },
-                            child: following ? const Text('FOLLOWING') : const Text('FOLLOW'), 
-                          )
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   )
                 ]

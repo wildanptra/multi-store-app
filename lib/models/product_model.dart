@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_store_app/minor_screens/edit_product.dart';
 import 'package:multi_store_app/minor_screens/product_detail.dart';
 import 'package:multi_store_app/providers/wish_provider.dart';
 import 'package:provider/provider.dart';
@@ -41,8 +42,8 @@ class _ProductModelState extends State<ProductModel> {
                 child: Column(
                   children: [
                     Container(
-                      constraints: const BoxConstraints(minHeight: 100, maxHeight: 250),
-                      child: Image(image: NetworkImage(widget.products['productImages'][0])),
+                      constraints: const BoxConstraints(minHeight: 100, maxHeight: 200),
+                      child: Image(image: NetworkImage(widget.products['productImages'][0]), fit: BoxFit.cover,),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -99,7 +100,13 @@ class _ProductModelState extends State<ProductModel> {
                               ),
                               widget.products['sid'] == FirebaseAuth.instance.currentUser!.uid  
                               ? IconButton(
-                                onPressed: (){}, 
+                                onPressed: (){
+                                  Navigator.push(
+                                    context, 
+                                    MaterialPageRoute(
+                                      builder: (context) => EditProduct(items: widget.products,) 
+                                    ));
+                                }, 
                                 icon: const Icon(
                                   Icons.edit, 
                                   color: Colors.red,

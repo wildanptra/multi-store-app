@@ -229,11 +229,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     child: Column(
                                       children: [
-                                        RepeatedListTile(icon: Icons.email, subTitle: data['email'] == '' ? 'email not filled in' : data['email'], title:'Email Address'),
+                                        RepeatedListTile(
+                                          icon: Icons.email,
+                                          subTitle: data['email'] == '' ? 'email not filled in' : data['email'],
+                                          title:'Email Address'
+                                        ),
                                         const YellowDivider(),
-                                        RepeatedListTile(icon: Icons.phone, subTitle: data['phone'] == '' ? "phone number not filled in " : data['phone'], title:'Phone No.'),
+                                        RepeatedListTile(
+                                          icon: Icons.phone, 
+                                          subTitle: data['phone'] == '' ? "phone number not filled in " : data['phone'], 
+                                          title:'Phone No.'
+                                        ),
                                         const YellowDivider(),
-                                        RepeatedListTile(icon: Icons.location_pin, subTitle: data['address'] == '' ? "address not filled in" : data['address'], title:'Address'),
+                                        RepeatedListTile(
+                                          icon: Icons.location_pin, 
+                                          subTitle: data['address'] == '' ? "address not filled in" : data['address'], 
+                                          title:'Address'
+                                        ),
                                       ]
                                     ),
                                   ),
@@ -282,7 +294,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     isDestructiveAction: true,
                                                     onPressed: () async {
                                                       await FirebaseAuth.instance.signOut();
-                                                      Navigator.pushReplacementNamed(context, '/welcome_screen');
+                                                      await Future.delayed(const Duration(microseconds: 100)).whenComplete(() {
+                                                        Navigator.pushReplacementNamed(context, '/welcome_screen');
+                                                      });
                                                     },
                                                     child: const Text('Yes'),
                                                   ),

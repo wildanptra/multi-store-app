@@ -22,7 +22,9 @@ class _CustomerLoginState extends State<CustomerLogin> {
   
   bool passwordVisible = true;
 
-
+  void navigate (){
+    Navigator.pushNamedAndRemoveUntil(context, '/customer_home', (route) => false);
+  }
 
   void logIn() async {
     setState(() {
@@ -34,7 +36,7 @@ class _CustomerLoginState extends State<CustomerLogin> {
 
         _formKey.currentState!.reset();
 
-        Navigator.pushNamedAndRemoveUntil(context, '/customer_home', (route) => false);
+        navigate();
 
       } on FirebaseAuthException catch (e) {
         if(e.code == 'user-not-found'){

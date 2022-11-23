@@ -49,6 +49,10 @@ dependencies:
   badges: ^2.0.3
   sn_progress_dialog: ^1.0.8
   flutter_datetime_picker: ^1.5.1
+  flutter_stripe: ^3.0.0
+  http: ^0.13.5
+  flutter_rating_bar: ^4.0.1
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:
