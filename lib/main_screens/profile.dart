@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_store_app/customer_screens/address_book.dart';
 import 'package:multi_store_app/customer_screens/customer_orders.dart';
 import 'package:multi_store_app/customer_screens/wishlist.dart';
 import 'package:multi_store_app/main_screens/cart.dart';
@@ -25,7 +26,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return 
     
     FutureBuilder<DocumentSnapshot>(
-      future: FirebaseAuth.instance.currentUser!.isAnonymous ? anonymous.doc(widget.documentId).get() : customers.doc(widget.documentId).get(),
+      future: FirebaseAuth.instance.currentUser!.isAnonymous 
+      ? anonymous.doc(widget.documentId).get() 
+      : customers.doc(widget.documentId).get(),
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
 
@@ -231,20 +234,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       children: [
                                         RepeatedListTile(
                                           icon: Icons.email,
-                                          subTitle: data['email'] == '' ? 'email not filled in' : data['email'],
-                                          title:'Email Address'
+                                          title:'Email Address',
+                                          subTitle: data['email'] == '' 
+                                          ? 'email not filled in' 
+                                          : data['email'],
                                         ),
                                         const YellowDivider(),
                                         RepeatedListTile(
                                           icon: Icons.phone, 
-                                          subTitle: data['phone'] == '' ? "phone number not filled in " : data['phone'], 
-                                          title:'Phone No.'
+                                          title:'Phone No.',
+                                          subTitle: data['phone'] == '' 
+                                          ? "phone number not filled in " 
+                                          : data['phone'], 
                                         ),
                                         const YellowDivider(),
                                         RepeatedListTile(
+                                          onPressed: FirebaseAuth.instance.currentUser!.isAnonymous ? null : (){
+                                            Navigator.push(
+                                              context, 
+                                              MaterialPageRoute(
+                                                builder: (context) => const AddressBook()
+                                              )
+                                            );
+                                          },
                                           icon: Icons.location_pin, 
-                                          subTitle: data['address'] == '' ? "address not filled in" : data['address'], 
-                                          title:'Address'
+                                          title:'Address',
+                                          subTitle: userAddress(data),
+                                          // data['address'] == '' 
+                                          // ? "address not filled in" 
+                                          // : data['address'], 
                                         ),
                                       ]
                                     ),
@@ -325,8 +343,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return const Center(child: CircularProgressIndicator(color: Colors.purple));
       },
     );
-
   }
+
+  String userAddress(dynamic data){
+    if(FirebaseAuth.instance.currentUser!.isAnonymous == true){
+      return 'address not filled in because you\'re guest';
+    }else if(FirebaseAuth.instance.currentUser!.isAnonymous == false && data['address'] == ''){
+      return 'Set Your Address';
+    }
+    return data['address'];
+  }
+
 }
 
 class YellowDivider extends StatelessWidget {
